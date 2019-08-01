@@ -74,6 +74,7 @@ class RedisSessionInterface(SessionInterface):
             'data': session,
             'expiration': expiration
         }
+        print(ssd)
         ssstr = cPickle.dumps(ssd)
         self.store.setex(session.sid, self.timeout, ssstr)
 
@@ -85,12 +86,12 @@ class RedisSessionInterface(SessionInterface):
 
 #########################################################################################
 # Create an application
-app = Flask(__name__)
-app.session_interface = RedisSessionInterface()
+application = Flask(__name__)
+application.session_interface = RedisSessionInterface()
 
 
 #########################################################################################
-@app.route("/")
+@application.route("/")
 def index():
     session.permanent = False
     if not 'refreshed' in session:
@@ -104,20 +105,20 @@ def index():
 
 
 #########################################################################################
-@app.route("/dbset/<dbname>")
+@application.route("/dbset/<dbname>")
 def dbset(dbname):
     session['dbname'] = dbname
     return redirect(url_for('index'))
 
 
 #########################################################################################
-@app.route("/kill")
+@application.route("/kill")
 def kill():
     session.clear()
     return redirect(url_for('index'))
 
 
-app.debug = True
+application.debug = True
 
 if __name__ == "__main__" :
-    app.run(host='0.0.0.0', port=80)
+    application.run(host='0.0.0.0', port=80)
